@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
-import { Users, Lock, Hash } from 'lucide-react';
+import { Users, Hash } from 'lucide-react';
 import { Card, Avatar, Badge, Button } from './ui';
 import { Room } from '../types';
 

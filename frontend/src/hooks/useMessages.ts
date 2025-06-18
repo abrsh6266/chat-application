@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { messagesApi, MessagesPaginationResponse } from '../api/messages';
+import { messagesApi } from '../api/messages';
 import {
   Message,
   ApiError,

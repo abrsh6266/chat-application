@@ -10,12 +10,16 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - chat-network
 
   redis:
     image: redis:7-alpine
     restart: always
     ports:
       - "6379:6379"
+    networks:
+      - chat-network
 
   backend:
     build:
@@ -27,12 +31,34 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - PORT=3000
-      - FRONTEND_URL=http://localhost:5173
+      - FRONTEND_URL=http://localhost
+      - JWT_SECRET=your-super-secret-jwt-key
     ports:
       - "3000:3000"
     depends_on:
       - db
       - redis
+    networks:
+      - chat-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:3000
+      - VITE_SOCKET_URL=http://localhost:3000
+    networks:
+      - chat-network
 
 volumes:
   db_data:
+
+networks:
+  chat-network:
+    driver: bridge

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { authApi } from '../api';
 import {
-  User,
   LoginRequest,
   RegisterRequest,
   AuthState,

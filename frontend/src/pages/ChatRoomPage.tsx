@@ -1,9 +1,8 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Users, Settings, Hash } from "lucide-react";
+import { ArrowLeft, Users, Hash } from "lucide-react";
 import {
-  Card,
   Button,
   IconButton,
   LoadingSpinner,

@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
-import { ChevronDown } from 'lucide-react';
 
 interface DropdownProps {
   trigger: React.ReactNode;

@@ -5,7 +5,6 @@ import {
   MessageCircle,
   LogOut,
   Users,
-  Settings,
   Menu,
   X,
   Hash,
@@ -15,8 +14,6 @@ import { useAuth, useRooms } from "../hooks";
 import {
   Button,
   Avatar,
-  Dropdown,
-  DropdownItem,
   StatusIndicator,
   LoadingSpinner,
   IconButton,

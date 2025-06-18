@@ -169,7 +169,7 @@ export const useChatSocket = (roomId?: string): UseChatSocketReturn => {
       // User presence events
       socket.on('onlineUsers', (data) => {
         console.log('👥 Received online users:', data);
-        const onlineUsersList = data.users.map(user => ({
+        const onlineUsersList = data.users.map((user: any) => ({
           id: user.userId,
           username: user.username,
           roomId: user.roomId,

@@ -1,11 +1,9 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {  AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, Filter, Users } from "lucide-react";
+import { Plus, Search, Users } from "lucide-react";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   Button,
   SearchInput,
   LoadingSpinner,
@@ -17,7 +15,6 @@ import {
   ModalFooter,
   Input,
   Textarea,
-  IconButton,
 } from "../components/ui";
 import { RoomListItem } from "../components/RoomListItem";
 import { useRooms } from "../hooks";

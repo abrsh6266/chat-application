@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { roomsApi } from '../api';
 import {
-  Room,
   RoomResponse,
   CreateRoomRequest,
   RoomState,

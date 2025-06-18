@@ -15,7 +15,7 @@ interface RegisterFormData extends RegisterRequest {
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
-  const { register, isLoading, error, clearError,isAuthenticated } = useAuth();
+  const { register, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<RegisterFormData>({
     username: '',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { Send, Smile, Paperclip } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { Textarea, IconButton } from './ui';
 
 interface ChatInputProps {
