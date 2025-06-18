@@ -6,6 +6,51 @@ A modern, full-stack real-time chat application built with React, NestJS, Socket
 ![TypeScript](https://img.shields.io/badge/TypeScript-100%25-blue)
 ![Docker](https://img.shields.io/badge/Docker-Supported-blue)
 
+## 🎯 What You Get
+
+✅ **Secure Authentication** - JWT-based login and registration  
+✅ **Real-Time Messaging** - Instant message delivery with Socket.IO  
+✅ **Room Management** - Create, join, and manage chat rooms  
+✅ **Live User Presence** - See who's online in real-time  
+✅ **Responsive Design** - Works perfectly on all devices  
+✅ **Docker Ready** - One-command deployment  
+
+## 📋 Table of Contents
+
+- [📸 Screenshots](#-screenshots)
+- [✨ Features](#-features)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🚀 Quick Start](#-quick-start)
+  - [Docker Deployment](#option-1-docker-deployment-recommended)
+  - [Local Development](#option-2-local-development)
+- [📝 Environment Variables](#-environment-variables)
+- [🐳 Docker Commands](#-docker-commands)
+- [📁 Project Structure](#-project-structure)
+- [🔧 Development](#-development)
+- [🚀 Production Deployment](#-production-deployment)
+
+## 📸 Screenshots
+
+### 🔐 Authentication Pages
+Clean and modern authentication interface with login and registration forms featuring form validation and responsive design.
+
+![Authentication Pages](./images/authPages.png)
+
+### 🏠 Room Management
+Browse, create, and join chat rooms with an intuitive interface. Features room search, member counts, and easy navigation.
+
+![Room Section](./images/roomSection.png)
+
+### ➕ Room Creation
+Easy room creation with name and description fields, plus real-time validation and user-friendly form design.
+
+![Create Room](./images/createRoom.png)
+
+### 💬 Real-Time Chat
+Full-featured chat interface with real-time messaging, online users sidebar, typing indicators, and message grouping.
+
+![Chat Section](./images/chatSection.png)
+
 ## ✨ Features
 
 ### 🔐 Authentication & Security
