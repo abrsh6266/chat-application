@@ -183,19 +183,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <span className="text-xs text-gray-500">Online</span>
               </div>
             </div>
-            <Dropdown
-              trigger={
-                <Button variant="ghost" size="sm" className="p-1 flex-shrink-0">
-                  <Settings className="h-4 w-4" />
-                </Button>
-              }
-              align="right"
-            >
-              <DropdownItem onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </DropdownItem>
-            </Dropdown>
           </div>
         </div>
 
@@ -303,6 +290,22 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               </div>
             )}
           </nav>
+        </div>
+
+        {/* Sign Out Button - Bottom */}
+        <div className="p-4 border-t border-gray-200 flex-shrink-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            fullWidth
+            className="justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+            onClick={handleLogout}
+          >
+            <span className="flex items-center gap-2 w-full">
+              <LogOut className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="truncate">Sign Out</span>
+            </span>
+          </Button>
         </div>
       </motion.aside>
 
