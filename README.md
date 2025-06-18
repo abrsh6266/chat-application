@@ -129,7 +129,7 @@ The easiest way to run the entire application with all dependencies:
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd chat-app
+cd chat-application
 
 # Start all services with Docker Compose
 docker-compose up --build
