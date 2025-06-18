@@ -1,7 +1,7 @@
 import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRoomDto } from './dto/create-room.dto';
-import { Room } from '@prisma/client';
+import { Prisma, Room } from '@prisma/client';
 
 @Injectable()
 export class RoomsService {

@@ -1,39 +1,49 @@
-FROM node:20-alpine3.19 AS build
+FROM node:20-slim AS build
 WORKDIR /app
 
-# Add build dependencies with retry logic and alternative mirror
-RUN echo "https://mirror.clarkson.edu/alpine/v3.19/main" > /etc/apk/repositories && \
-    echo "https://mirror.clarkson.edu/alpine/v3.19/community" >> /etc/apk/repositories && \
-    apk update && \
-    apk add --no-cache \
-        python3 \
-        make \
-        g++ \
-        build-base \
-        linux-headers
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
+# Copy package files and install dependencies
 COPY package*.json ./
+COPY prisma ./prisma/
 RUN npm install
-COPY . .
-RUN npm run build 
 
-FROM node:20-alpine3.19
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Copy the rest of the application
+COPY . .
+RUN npm run build
+
+FROM node:20-slim
 WORKDIR /app
 
-# Add runtime dependencies with retry logic and alternative mirror
-RUN echo "https://mirror.clarkson.edu/alpine/v3.19/main" > /etc/apk/repositories && \
-    echo "https://mirror.clarkson.edu/alpine/v3.19/community" >> /etc/apk/repositories && \
-    apk update && \
-    apk add --no-cache \
-        python3 \
-        make \
-        g++ \
-        build-base
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
+# Copy necessary files from build stage
 COPY --from=build /app/package*.json ./
-RUN npm install --omit=dev 
+COPY --from=build /app/prisma ./prisma/
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=build /app/node_modules/@prisma ./node_modules/@prisma
+
+# Install production dependencies
+RUN npm install --omit=dev
 RUN npm install -g pm2
+
+# Copy PM2 config
 COPY ecosystem.config.js .
 
 # Handle .env file
