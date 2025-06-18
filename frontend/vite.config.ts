@@ -11,7 +11,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 5173,
     host: true,
     proxy: {
       '/api': {
@@ -33,7 +33,7 @@ export default defineConfig({
     minify: 'esbuild',
   },
   preview: {
-    port: 3000,
+    port: 5173,
     host: true,
   },
 })
