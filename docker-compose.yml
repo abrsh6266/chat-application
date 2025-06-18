@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: chatdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/chatdb
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PORT=3000
+      - FRONTEND_URL=http://localhost:5173
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  db_data:
