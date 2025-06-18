@@ -16,7 +16,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
-    "paths": { "@/*": ["./src/*"] }
+    "paths": { "@/*": ["./src/*"] },
+    "types": ["node"]
   },
   "include": ["src/**/*", "src/**/*.tsx", "src/**/*.ts"],
   "exclude": ["node_modules", "dist"],

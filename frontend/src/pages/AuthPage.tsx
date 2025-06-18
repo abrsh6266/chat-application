@@ -50,7 +50,7 @@ export const AuthPage: React.FC = () => {
         </motion.div>
 
         <Card variant="elevated" className="overflow-hidden">
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-gray-200 mb-4">
             <button
               onClick={() => setMode('login')}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${

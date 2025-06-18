@@ -137,22 +137,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
           </button>
         </p>
       </div>
-
-      <div className="mt-6 p-3 bg-gray-50 rounded-lg">
-        <p className="text-xs text-gray-600 mb-2 font-medium">Demo Credentials:</p>
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div>
-            <span className="text-gray-500">Email:</span>
-            <br />
-            <code className="text-gray-700">demo@example.com</code>
-          </div>
-          <div>
-            <span className="text-gray-500">Password:</span>
-            <br />
-            <code className="text-gray-700">demo123</code>
-          </div>
-        </div>
-      </div>
     </motion.form>
   );
 }; 
