@@ -1,7 +1,7 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Users, Settings, Hash, Lock } from 'lucide-react';
+import React from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Users, Settings, Hash } from "lucide-react";
 import {
   Card,
   Button,
@@ -10,21 +10,21 @@ import {
   EmptyState,
   ConnectionStatus,
   Badge,
-} from '../components/ui';
-import { ChatInput } from '../components/ChatInput';
-import { OnlineUserListItem } from '../components/OnlineUserListItem';
-import { useAuth, useRooms, useMessages, useChatSocket } from '../hooks';
-import { Message as MessageType } from '../types';
-import { Message } from '../components/Message';
+} from "../components/ui";
+import { ChatInput } from "../components/ChatInput";
+import { OnlineUserListItem } from "../components/OnlineUserListItem";
+import { useAuth, useRooms, useMessages, useChatSocket } from "../hooks";
+import { Message as MessageType } from "../types";
+import { Message } from "../components/Message";
 
 export const ChatRoomPage: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { currentRoom, fetchRoomById, isLoading: roomLoading } = useRooms();
-  const { 
-    messages: historicalMessages, 
-    isLoading: messagesLoading, 
+  const {
+    messages: historicalMessages,
+    isLoading: messagesLoading,
     fetchMessages,
   } = useMessages();
   const {
@@ -40,20 +40,22 @@ export const ChatRoomPage: React.FC = () => {
     error: socketError,
   } = useChatSocket(roomId);
 
-  const [messageInput, setMessageInput] = React.useState('');
+  const [messageInput, setMessageInput] = React.useState("");
   const [showUserList, setShowUserList] = React.useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
   // Merge historical and socket messages, removing duplicates
   const messages = React.useMemo(() => {
     const allMessages = [...historicalMessages, ...socketMessages];
-    const uniqueMessages = allMessages.filter((message, index, array) => 
-      array.findIndex(m => m.id === message.id) === index
+    const uniqueMessages = allMessages.filter(
+      (message, index, array) =>
+        array.findIndex((m) => m.id === message.id) === index
     );
-    
+
     // Sort by creation date to ensure proper order
-    return uniqueMessages.sort((a, b) => 
-      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    return uniqueMessages.sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
   }, [historicalMessages, socketMessages]);
 
@@ -81,14 +83,16 @@ export const ChatRoomPage: React.FC = () => {
   // Add current user to online users when connected and in room
   const enhancedOnlineUsers = React.useMemo(() => {
     if (!user || !roomId || !isConnected) return onlineUsers;
-    
+
     // Check if current user is already in the list
-    const currentUserExists = onlineUsers.some(onlineUser => onlineUser.id === user.id);
-    
+    const currentUserExists = onlineUsers.some(
+      (onlineUser) => onlineUser.id === user.id
+    );
+
     if (currentUserExists) {
       return onlineUsers;
     }
-    
+
     // Add current user to the list
     return [
       {
@@ -102,32 +106,36 @@ export const ChatRoomPage: React.FC = () => {
 
   // Auto scroll to bottom
   React.useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSendMessage = () => {
     if (!messageInput.trim()) return;
-    
+
     sendMessage(messageInput);
-    setMessageInput('');
+    setMessageInput("");
   };
 
   const handleLeaveRoom = () => {
     if (roomId) {
       leaveRoom(roomId);
     }
-    navigate('/rooms');
+    navigate("/rooms");
   };
 
   const groupMessages = (messages: MessageType[]) => {
-    const grouped: Array<{ messages: MessageType[]; user: any; timestamp: string }> = [];
+    const grouped: Array<{
+      messages: MessageType[];
+      user: any;
+      timestamp: string;
+    }> = [];
     let currentGroup: MessageType[] = [];
     let currentUserId: string | null = null;
     let currentTime: string | null = null;
 
     messages.forEach((message) => {
       const messageTime = new Date(message.createdAt).toDateString();
-      
+
       if (message.userId !== currentUserId || messageTime !== currentTime) {
         if (currentGroup.length > 0) {
           grouped.push({
@@ -155,7 +163,10 @@ export const ChatRoomPage: React.FC = () => {
     return grouped;
   };
 
-  const messageGroups = React.useMemo(() => groupMessages(messages), [messages]);
+  const messageGroups = React.useMemo(
+    () => groupMessages(messages),
+    [messages]
+  );
 
   if (!roomId) {
     return (
@@ -164,9 +175,7 @@ export const ChatRoomPage: React.FC = () => {
           title="Room not found"
           description="The room you're looking for doesn't exist"
           action={
-            <Button onClick={() => navigate('/rooms')}>
-              Back to Rooms
-            </Button>
+            <Button onClick={() => navigate("/rooms")}>Back to Rooms</Button>
           }
         />
       </div>
@@ -183,7 +192,6 @@ export const ChatRoomPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-4 py-3">
@@ -194,15 +202,17 @@ export const ChatRoomPage: React.FC = () => {
                 variant="ghost"
                 onClick={handleLeaveRoom}
               />
-              
+
               <div className="flex items-center gap-2">
                 <Hash className="h-5 w-5 text-primary-600" />
                 <div>
                   <h1 className="text-lg font-semibold text-gray-900">
-                    {currentRoom?.name || 'Unknown Room'}
+                    {currentRoom?.name || "Unknown Room"}
                   </h1>
                   {currentRoom?.description && (
-                    <p className="text-sm text-gray-500">{currentRoom.description}</p>
+                    <p className="text-sm text-gray-500">
+                      {currentRoom.description}
+                    </p>
                   )}
                 </div>
               </div>
@@ -213,7 +223,7 @@ export const ChatRoomPage: React.FC = () => {
                 <ConnectionStatus isConnected={isConnected} />
                 {!isConnected && (
                   <span className="text-xs text-red-500">
-                    {socketError ? 'Connection Error' : 'Connecting...'}
+                    {socketError ? "Connection Error" : "Connecting..."}
                   </span>
                 )}
                 {isConnected && enhancedOnlineUsers.length > 0 && (
@@ -222,22 +232,17 @@ export const ChatRoomPage: React.FC = () => {
                   </span>
                 )}
               </div>
-              
+
               <IconButton
                 icon={<Users />}
                 variant="ghost"
                 onClick={() => setShowUserList(!showUserList)}
               />
-              
-              <IconButton
-                icon={<Settings />}
-                variant="ghost"
-              />
             </div>
           </div>
 
           {/* Error Banner */}
-          {socketError && socketError !== 'Authentication required' && (
+          {socketError && socketError !== "Authentication required" && (
             <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
               <p className="text-sm text-red-700">{socketError}</p>
             </div>
@@ -277,26 +282,31 @@ export const ChatRoomPage: React.FC = () => {
                   </motion.div>
                 ))}
               </AnimatePresence>
-              
+
               {/* Typing Indicators */}
               {typingUsers.length > 0 && (
                 <div className="px-4 py-2">
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <div className="flex space-x-1">
                       <div className="h-1 w-1 bg-primary-500 rounded-full animate-bounce" />
-                      <div className="h-1 w-1 bg-primary-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="h-1 w-1 bg-primary-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <div
+                        className="h-1 w-1 bg-primary-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "150ms" }}
+                      />
+                      <div
+                        className="h-1 w-1 bg-primary-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "300ms" }}
+                      />
                     </div>
                     <span>
-                      {typingUsers.length === 1 
+                      {typingUsers.length === 1
                         ? `${typingUsers[0].username} is typing...`
-                        : `${typingUsers.length} people are typing...`
-                      }
+                        : `${typingUsers.length} people are typing...`}
                     </span>
                   </div>
                 </div>
               )}
-              
+
               <div ref={messagesEndRef} />
             </div>
           )}
@@ -334,18 +344,20 @@ export const ChatRoomPage: React.FC = () => {
                 </Badge>
               </div>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto p-4">
               <div className="space-y-2">
                 {enhancedOnlineUsers.map((user) => (
                   <OnlineUserListItem
                     key={user.id}
                     user={user}
-                    isTyping={typingUsers.some(typing => typing.id === user.id)}
+                    isTyping={typingUsers.some(
+                      (typing) => typing.id === user.id
+                    )}
                   />
                 ))}
               </div>
-              
+
               {enhancedOnlineUsers.length === 0 && (
                 <EmptyState
                   title="No one online"
