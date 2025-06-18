@@ -24,7 +24,13 @@ import {
       @Body() createRoomDto: CreateRoomDto,
       @CurrentUser('id') userId: string,
     ) {
-      return this.roomsService.createRoom(createRoomDto, userId);
+      try {
+        const result = await this.roomsService.createRoom(createRoomDto, userId);
+        return result;
+      } catch (error) {
+        console.error('Room creation failed in controller:', error);
+        throw error;
+      }
     }
   
     @Get()

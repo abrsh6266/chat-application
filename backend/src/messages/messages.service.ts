@@ -94,12 +94,14 @@ export class MessagesService {
     });
 
     return {
-      messages: messages.reverse(), // Show oldest first
-      pagination: {
+      data: messages.reverse(), // Show oldest first
+      meta: {
         page,
         limit,
         total: totalMessages,
         totalPages: Math.ceil(totalMessages / limit),
+        hasNextPage: page < Math.ceil(totalMessages / limit),
+        hasPrevPage: page > 1,
       },
     };
   }

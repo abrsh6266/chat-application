@@ -19,12 +19,13 @@ model User {
 }
 
 model Room {
-    id        String    @id @default(uuid())
-    name      String    @unique
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-    messages  Message[]
-    users     User[]    @relation("UserRooms")
+    id          String    @id @default(uuid())
+    name        String    @unique
+    description String?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    messages    Message[]
+    users       User[]    @relation("UserRooms")
 }
 
 model Message {

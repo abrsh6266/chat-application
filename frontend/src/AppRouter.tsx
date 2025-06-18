@@ -19,7 +19,7 @@ export const AppRouter: React.FC = () => {
         }
       />
       <Route
-        path="/room/:roomId"
+        path="/rooms/:roomId"
         element={
           <AppLayout>
             <ChatRoomPage />

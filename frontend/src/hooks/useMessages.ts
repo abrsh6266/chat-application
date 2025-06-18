@@ -37,12 +37,17 @@ export const useMessages = () => {
       setMessagesState(prev => ({ ...prev, isLoading: true, error: null }));
       const response = await messagesApi.getMessagesByRoom({ roomId, page, limit });
       
+      // Calculate pagination info
+      const totalPages = response.meta.totalPages;
+      const hasNextPage = response.meta.hasNextPage;
+      const hasPrevPage = response.meta.hasPrevPage;
+      
       setMessagesState(prev => ({
         ...prev,
         messages: response.data,
-        hasNextPage: response.meta.hasNextPage,
-        hasPrevPage: response.meta.hasPrevPage,
-        totalPages: response.meta.totalPages,
+        hasNextPage,
+        hasPrevPage,
+        totalPages,
         currentPage: response.meta.page,
         totalCount: response.meta.total,
         isLoading: false,
@@ -71,12 +76,17 @@ export const useMessages = () => {
       const nextPage = messagesState.currentPage + 1;
       const response = await messagesApi.getMessagesByRoom({ roomId, page: nextPage, limit });
       
+      // Calculate pagination info
+      const totalPages = response.meta.totalPages;
+      const hasNextPage = response.meta.hasNextPage;
+      const hasPrevPage = response.meta.hasPrevPage;
+      
       setMessagesState(prev => ({
         ...prev,
         messages: [...prev.messages, ...response.data],
-        hasNextPage: response.meta.hasNextPage,
-        hasPrevPage: response.meta.hasPrevPage,
-        totalPages: response.meta.totalPages,
+        hasNextPage,
+        hasPrevPage,
+        totalPages,
         currentPage: response.meta.page,
         totalCount: response.meta.total,
         isLoading: false,

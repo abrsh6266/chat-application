@@ -45,6 +45,7 @@ import {
         // Generate JWT token
         const payload = { 
           sub: user.id, 
+          id: user.id,
           username: user.username 
         };
         const access_token = this.jwtService.sign(payload);
@@ -84,6 +85,7 @@ import {
       // Generate JWT token
       const payload = { 
         sub: user.id, 
+        id: user.id,
         username: user.username 
       };
       const access_token = this.jwtService.sign(payload);

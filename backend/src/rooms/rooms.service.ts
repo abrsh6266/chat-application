@@ -9,7 +9,6 @@ export class RoomsService {
 
   async createRoom(createRoomDto: CreateRoomDto, userId: string): Promise<Room> {
     try {
-      // Check if room name already exists
       const existingRoom = await this.prisma.room.findUnique({
         where: { name: createRoomDto.name },
       });
@@ -22,6 +21,7 @@ export class RoomsService {
       const room = await this.prisma.room.create({
         data: {
           name: createRoomDto.name,
+          description: createRoomDto.description,
           users: {
             connect: { id: userId },
           },
@@ -43,8 +43,17 @@ export class RoomsService {
         },
       });
 
+      console.log('Room created successfully:', room);
       return room;
     } catch (error) {
+      console.error('Error creating room:', error);
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        code: error.code,
+        meta: error.meta
+      });
+      
       if (error instanceof ConflictException) {
         throw error;
       }

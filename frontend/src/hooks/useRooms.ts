@@ -20,7 +20,15 @@ export const useRooms = () => {
     try {
       setRoomState(prev => ({ ...prev, isLoading: true, error: null }));
       const rooms = await roomsApi.getAllRooms();
-      setRoomState(prev => ({ ...prev, rooms, isLoading: false }));
+      
+      // Filter out rooms with no users
+      const roomsWithUsers = rooms.filter(room => {
+        const userCount = room._count?.users || 0;
+        const usersArrayLength = room.users?.length || 0;
+        return userCount > 0 || usersArrayLength > 0;
+      });
+      
+      setRoomState(prev => ({ ...prev, rooms: roomsWithUsers, isLoading: false }));
     } catch (error) {
       const apiError = error as ApiError;
       setRoomState(prev => ({ 
@@ -69,21 +77,30 @@ export const useRooms = () => {
 
   const createRoom = useCallback(async (roomData: CreateRoomRequest) => {
     try {
-      setRoomState(prev => ({ ...prev, isLoading: true, error: null }));
+      setRoomState(prev => ({ ...prev, error: null }));
       const newRoom = await roomsApi.createRoom(roomData);
       
+      // Mark the newly created room as joined since the creator automatically joins
+      const roomWithJoinedStatus = {
+        ...newRoom,
+        isJoined: true,
+        _count: {
+          users: 1, // Creator is automatically added
+          messages: 0
+        }
+      };
+      
+      // Add the new room to the beginning of the list
       setRoomState(prev => ({
         ...prev,
-        rooms: [newRoom, ...prev.rooms],
-        isLoading: false,
+        rooms: [roomWithJoinedStatus, ...prev.rooms],
       }));
       
-      return newRoom;
+      return roomWithJoinedStatus;
     } catch (error) {
       const apiError = error as ApiError;
       setRoomState(prev => ({ 
         ...prev, 
-        isLoading: false, 
         error: apiError.message 
       }));
       throw error;
@@ -98,7 +115,15 @@ export const useRooms = () => {
         ...prev,
         rooms: prev.rooms.map(room => 
           room.id === roomId 
-            ? { ...room, isJoined: true, users: updatedRoom.users, _count: updatedRoom._count }
+            ? { 
+                ...room, 
+                isJoined: true, 
+                users: updatedRoom.users || room.users, 
+                _count: {
+                  ...room._count,
+                  users: updatedRoom._count?.users || (room._count?.users || 0) + 1
+                }
+              }
             : room
         ),
         error: null,
@@ -119,16 +144,34 @@ export const useRooms = () => {
     try {
       await roomsApi.leaveRoom(roomId);
       
-      setRoomState(prev => ({
-        ...prev,
-        rooms: prev.rooms.map(room => 
-          room.id === roomId 
-            ? { ...room, isJoined: false }
-            : room
-        ),
-        currentRoom: prev.currentRoom?.id === roomId ? null : prev.currentRoom,
-        error: null,
-      }));
+      setRoomState(prev => {
+        const updatedRooms = prev.rooms.map(room => {
+          if (room.id === roomId) {
+            const newUserCount = Math.max(0, (room._count?.users || 1) - 1);
+            return { 
+              ...room, 
+              isJoined: false, 
+              _count: { 
+                ...room._count, 
+                users: newUserCount 
+              }
+            };
+          }
+          return room;
+        });
+        
+        // Filter out rooms with no users after leaving
+        const roomsWithUsers = updatedRooms.filter(room => 
+          (room._count?.users || 0) > 0
+        );
+        
+        return {
+          ...prev,
+          rooms: roomsWithUsers,
+          currentRoom: prev.currentRoom?.id === roomId ? null : prev.currentRoom,
+          error: null,
+        };
+      });
     } catch (error) {
       const apiError = error as ApiError;
       setRoomState(prev => ({ 
@@ -163,7 +206,13 @@ export const useRooms = () => {
     try {
       setRoomState(prev => ({ ...prev, isLoading: true, error: null }));
       const rooms = await roomsApi.searchRooms(query);
-      setRoomState(prev => ({ ...prev, rooms, isLoading: false }));
+      
+      // Filter out rooms with no users
+      const roomsWithUsers = rooms.filter(room => 
+        room._count?.users > 0 || room.users?.length > 0
+      );
+      
+      setRoomState(prev => ({ ...prev, rooms: roomsWithUsers, isLoading: false }));
     } catch (error) {
       const apiError = error as ApiError;
       setRoomState(prev => ({ 
@@ -267,6 +316,11 @@ export const useRooms = () => {
     }
   }, [roomState.currentRoom, fetchRoomById]);
 
+  // Add a method to refetch rooms after operations
+  const refetchRooms = useCallback(async () => {
+    await fetchAllRooms();
+  }, [fetchAllRooms]);
+
   return {
     rooms: roomState.rooms,
     currentRoom: roomState.currentRoom,
@@ -290,5 +344,6 @@ export const useRooms = () => {
     isUserInRoom,
     refreshRooms,
     refreshCurrentRoom,
+    refetchRooms,
   };
 }; 

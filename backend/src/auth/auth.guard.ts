@@ -13,9 +13,8 @@ import {
   
     async canActivate(context: ExecutionContext): Promise<boolean> {
       const request = context.switchToHttp().getRequest();
-      const token = this.extractTokenFromHeader(request);
-      
-      if (!token) {
+      const token = this.extractTokenFromHeader(request);      
+      if (!token) {        
         throw new UnauthorizedException('Access token is required');
       }
       
@@ -24,9 +23,13 @@ import {
           secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key',
         });
         
+        console.log('AuthGuard - JWT payload:', payload);
+        
         // Attach the payload to the request object so we can access it in route handlers
         request['user'] = payload;
+        console.log('AuthGuard - User attached to request:', request['user']);
       } catch (error) {
+        console.log('AuthGuard - JWT verification failed:', error.message);
         throw new UnauthorizedException('Invalid or expired token');
       }
       
