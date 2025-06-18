@@ -47,31 +47,85 @@ import {
     ) {}
   
     async handleConnection(client: AuthenticatedSocket) {
+      this.logger.log('🔌 New socket connection attempt');
+      
       try {
-        const token = client.handshake.auth?.token || client.handshake.headers?.authorization?.split(' ')[1];
+        // Extract token from multiple possible sources
+        let token = client.handshake.auth?.token;
         
         if (!token) {
+          // Try from headers
+          const authHeader = client.handshake.headers?.authorization;
+          if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.split(' ')[1];
+          }
+        }
+        
+        if (!token) {
+          // Try from query params as fallback
+          token = client.handshake.query?.token as string;
+        }
+        
+        this.logger.log('Auth sources checked:', {
+          authToken: !!client.handshake.auth?.token,
+          authHeader: !!client.handshake.headers?.authorization,
+          queryToken: !!client.handshake.query?.token,
+          finalToken: !!token
+        });
+        
+        if (!token) {
+          this.logger.error('❌ No authentication token provided');
+          client.emit('error', { message: 'Authentication token required' });
           client.disconnect();
           return;
         }
-  
+
+        this.logger.log(`🔑 Attempting to authenticate token: ${token.substring(0, 20)}...`);
+
         const payload = this.jwtService.verify(token);
+
+        this.logger.log(`✅ JWT payload decoded successfully:`, { 
+          sub: payload.sub, 
+          username: payload.username,
+          exp: payload.exp,
+          iat: payload.iat
+        });
+
         const user = await this.prisma.user.findUnique({
           where: { id: payload.sub },
           select: { id: true, username: true },
         });
-  
+
         if (!user) {
+          this.logger.error(`❌ User not found for ID: ${payload.sub}`);
+          client.emit('error', { message: 'User not found' });
           client.disconnect();
           return;
         }
-  
+
         client.userId = user.id;
         client.username = user.username;
-  
-        this.logger.log(`User ${user.username} connected with socket ${client.id}`);
+
+        this.logger.log(`✅ User ${user.username} (${user.id}) successfully authenticated with socket ${client.id}`);
+        
+        // Send success confirmation to client
+        client.emit('authenticated', { 
+          userId: user.id, 
+          username: user.username 
+        });
+        
       } catch (error) {
-        this.logger.error('Authentication failed:', error.message);
+        this.logger.error('❌ Authentication failed:', {
+          message: error.message,
+          name: error.name,
+          stack: error.stack?.split('\n')[0]
+        });
+        
+        client.emit('error', { 
+          message: error.message.includes('jwt') 
+            ? 'Invalid or expired authentication token' 
+            : 'Authentication failed' 
+        });
         client.disconnect();
       }
     }
@@ -226,11 +280,14 @@ import {
     ) {
       if (!client.userId) return;
   
-      client.to(data.roomId).emit('userJoined', {
+      // Emit typing event to other users in the room
+      client.to(data.roomId).emit('typing', {
         userId: client.userId,
         username: client.username,
         roomId: data.roomId,
       });
+  
+      this.logger.log(`User ${client.username} is typing in room ${data.roomId}`);
     }
   
     @SubscribeMessage('stopTyping')
@@ -240,10 +297,13 @@ import {
     ) {
       if (!client.userId) return;
   
-      client.to(data.roomId).emit('userLeft', {
+      // Emit stop typing event to other users in the room
+      client.to(data.roomId).emit('stopTyping', {
         userId: client.userId,
         username: client.username,
         roomId: data.roomId,
       });
+  
+      this.logger.log(`User ${client.username} stopped typing in room ${data.roomId}`);
     }
   }

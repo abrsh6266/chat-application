@@ -182,7 +182,19 @@ export const ChatRoomPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <ConnectionStatus isConnected={isConnected} />
+              <div className="flex items-center gap-2">
+                <ConnectionStatus isConnected={isConnected} />
+                {!isConnected && (
+                  <span className="text-xs text-red-500">
+                    {socketError ? 'Connection Error' : 'Connecting...'}
+                  </span>
+                )}
+                {isConnected && onlineUsers.length > 0 && (
+                  <span className="text-xs text-gray-500">
+                    {onlineUsers.length} online
+                  </span>
+                )}
+              </div>
               
               <IconButton
                 icon={<Users />}
@@ -196,6 +208,13 @@ export const ChatRoomPage: React.FC = () => {
               />
             </div>
           </div>
+
+          {/* Error Banner */}
+          {socketError && (
+            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-700">{socketError}</p>
+            </div>
+          )}
         </div>
 
         {/* Messages */}

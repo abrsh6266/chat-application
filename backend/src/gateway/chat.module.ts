@@ -9,8 +9,10 @@ import { MessagesModule } from '../messages/messages.module';
     PrismaModule,
     MessagesModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'your-secret-key',
-      signOptions: { expiresIn: '24h' },
+      secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key',
+      signOptions: { 
+        expiresIn: process.env.JWT_EXPIRES_IN || '7d' 
+      },
     }),
   ],
   providers: [ChatGateway],
