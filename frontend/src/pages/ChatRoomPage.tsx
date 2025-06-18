@@ -23,10 +23,9 @@ export const ChatRoomPage: React.FC = () => {
   const { user } = useAuth();
   const { currentRoom, fetchRoomById, isLoading: roomLoading } = useRooms();
   const { 
-    messages, 
+    messages: historicalMessages, 
     isLoading: messagesLoading, 
     fetchMessages,
-    addMessage,
   } = useMessages();
   const {
     messages: socketMessages,
@@ -44,6 +43,19 @@ export const ChatRoomPage: React.FC = () => {
   const [messageInput, setMessageInput] = React.useState('');
   const [showUserList, setShowUserList] = React.useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  // Merge historical and socket messages, removing duplicates
+  const messages = React.useMemo(() => {
+    const allMessages = [...historicalMessages, ...socketMessages];
+    const uniqueMessages = allMessages.filter((message, index, array) => 
+      array.findIndex(m => m.id === message.id) === index
+    );
+    
+    // Sort by creation date to ensure proper order
+    return uniqueMessages.sort((a, b) => 
+      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  }, [historicalMessages, socketMessages]);
 
   // Load room and messages
   React.useEffect(() => {
@@ -66,12 +78,27 @@ export const ChatRoomPage: React.FC = () => {
     };
   }, [roomId, isConnected, joinRoom, leaveRoom]);
 
-  // Add socket messages to local state
-  React.useEffect(() => {
-    socketMessages.forEach(message => {
-      addMessage(message);
-    });
-  }, [socketMessages, addMessage]);
+  // Add current user to online users when connected and in room
+  const enhancedOnlineUsers = React.useMemo(() => {
+    if (!user || !roomId || !isConnected) return onlineUsers;
+    
+    // Check if current user is already in the list
+    const currentUserExists = onlineUsers.some(onlineUser => onlineUser.id === user.id);
+    
+    if (currentUserExists) {
+      return onlineUsers;
+    }
+    
+    // Add current user to the list
+    return [
+      {
+        id: user.id,
+        username: user.username,
+        roomId: roomId,
+      },
+      ...onlineUsers,
+    ];
+  }, [onlineUsers, user, roomId, isConnected]);
 
   // Auto scroll to bottom
   React.useEffect(() => {
@@ -189,9 +216,9 @@ export const ChatRoomPage: React.FC = () => {
                     {socketError ? 'Connection Error' : 'Connecting...'}
                   </span>
                 )}
-                {isConnected && onlineUsers.length > 0 && (
+                {isConnected && enhancedOnlineUsers.length > 0 && (
                   <span className="text-xs text-gray-500">
-                    {onlineUsers.length} online
+                    {enhancedOnlineUsers.length} online
                   </span>
                 )}
               </div>
@@ -210,7 +237,7 @@ export const ChatRoomPage: React.FC = () => {
           </div>
 
           {/* Error Banner */}
-          {socketError && (
+          {socketError && socketError !== 'Authentication required' && (
             <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
               <p className="text-sm text-red-700">{socketError}</p>
             </div>
@@ -303,14 +330,14 @@ export const ChatRoomPage: React.FC = () => {
                   Online Users
                 </h2>
                 <Badge variant="primary" size="sm">
-                  {onlineUsers.length}
+                  {enhancedOnlineUsers.length}
                 </Badge>
               </div>
             </div>
             
             <div className="flex-1 overflow-y-auto p-4">
               <div className="space-y-2">
-                {onlineUsers.map((user) => (
+                {enhancedOnlineUsers.map((user) => (
                   <OnlineUserListItem
                     key={user.id}
                     user={user}
@@ -319,7 +346,7 @@ export const ChatRoomPage: React.FC = () => {
                 ))}
               </div>
               
-              {onlineUsers.length === 0 && (
+              {enhancedOnlineUsers.length === 0 && (
                 <EmptyState
                   title="No one online"
                   description="Be the first to join this room"

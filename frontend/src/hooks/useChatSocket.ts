@@ -167,6 +167,16 @@ export const useChatSocket = (roomId?: string): UseChatSocketReturn => {
       });
 
       // User presence events
+      socket.on('onlineUsers', (data) => {
+        console.log('👥 Received online users:', data);
+        const onlineUsersList = data.users.map(user => ({
+          id: user.userId,
+          username: user.username,
+          roomId: user.roomId,
+        }));
+        setOnlineUsers(onlineUsersList);
+      });
+
       socket.on('userJoined', (data: UserJoinedData) => {
         console.log('👋 User joined:', data);
         setOnlineUsers(prev => {

@@ -2,6 +2,7 @@ export interface ServerToClientEvents {
     message: (data: MessageData) => void;
     userJoined: (data: UserJoinedData) => void;
     userLeft: (data: UserLeftData) => void;
+    onlineUsers: (data: OnlineUsersData) => void;
     error: (data: ErrorData) => void;
     roomCreated: (data: RoomData) => void;
   }
@@ -71,4 +72,13 @@ export interface ServerToClientEvents {
   export interface StopTypingData {
     roomId: string;
     userId: string;
+  }
+
+  export interface OnlineUsersData {
+    users: Array<{
+      userId: string;
+      username: string;
+      roomId: string;
+    }>;
+    roomId: string;
   }

@@ -191,16 +191,41 @@ import {
         if (!this.activeUsers.has(data.roomId)) {
           this.activeUsers.set(data.roomId, new Set());
         }
+        
+        // Get current online users before adding the new user
+        const currentOnlineUsers = Array.from(this.activeUsers.get(data.roomId) || []);
+        
+        // Add the new user to active users
         this.activeUsers.get(data.roomId).add(client.userId);
   
-        // Notify others in the room
+        // Send current online users to the joining user
+        const onlineUsersData = [];
+        for (const userId of currentOnlineUsers) {
+          // Find the user info from room users
+          const userInfo = room.users.find(u => u.id === userId);
+          if (userInfo) {
+            onlineUsersData.push({
+              userId: userInfo.id,
+              username: userInfo.username,
+              roomId: data.roomId,
+            });
+          }
+        }
+  
+        // Send the list of currently online users to the joining user
+        client.emit('onlineUsers', {
+          users: onlineUsersData,
+          roomId: data.roomId,
+        });
+  
+        // Notify others in the room that this user joined
         client.to(data.roomId).emit('userJoined', {
           userId: client.userId,
           username: client.username,
           roomId: data.roomId,
         });
   
-        this.logger.log(`User ${client.username} joined room ${room.name}`);
+        this.logger.log(`User ${client.username} joined room ${room.name}. Online users: ${this.activeUsers.get(data.roomId).size}`);
       } catch (error) {
         this.logger.error('Error joining room:', error.message);
         client.emit('error', { message: 'Failed to join room' });

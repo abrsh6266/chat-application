@@ -93,14 +93,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className={clsx('flex items-end gap-2 p-4 bg-white border-t border-gray-200', className)}>
-      {/* Attachment Button */}
-      <IconButton
-        icon={<Paperclip />}
-        variant="ghost"
-        size="md"
-        disabled={disabled}
-        className="mb-2"
-      />
 
       {/* Input Area */}
       <div className="flex-1 relative">
@@ -126,15 +118,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           }}
         />
 
-        {/* Emoji Button */}
-        <div className="absolute right-2 bottom-2">
-          <IconButton
-            icon={<Smile />}
-            variant="ghost"
-            size="sm"
-            disabled={disabled}
-          />
-        </div>
+
       </div>
 
       {/* Send Button */}

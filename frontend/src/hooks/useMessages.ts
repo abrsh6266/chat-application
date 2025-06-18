@@ -105,11 +105,19 @@ export const useMessages = () => {
   }, [messagesState.hasNextPage, messagesState.isLoading, messagesState.currentPage]);
 
   const addMessage = useCallback((message: Message) => {
-    setMessagesState(prev => ({
-      ...prev,
-      messages: [...prev.messages, message],
-      totalCount: prev.totalCount + 1,
-    }));
+    setMessagesState(prev => {
+      // Check if message already exists to prevent duplicates
+      const existingMessage = prev.messages.find(msg => msg.id === message.id);
+      if (existingMessage) {
+        return prev; // Don't add duplicate
+      }
+      
+      return {
+        ...prev,
+        messages: [...prev.messages, message],
+        totalCount: prev.totalCount + 1,
+      };
+    });
   }, []);
 
   const removeMessage = useCallback((messageId: string) => {
